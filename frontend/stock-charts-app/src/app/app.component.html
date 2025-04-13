@@ -1,0 +1,30 @@
+<div class="app-container">
+  <header class="app-header">
+    <div class="logo">
+      <h1>StockCharts</h1>
+      <p>Wykresy giełdowe z API Alpha Vantage</p>
+    </div>
+    <nav class="main-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Popularne akcje</a>
+      <a routerLink="/search" routerLinkActive="active">Wyszukiwarka</a>
+    </nav>
+  </header>
+  
+  <main class="app-content">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <footer class="app-footer">
+    <p>&copy; 2023 StockCharts - Aplikacja DDD w technologiach Flask i Angular</p>
+    <div class="version-info">
+      Frontend: v{{ appVersion }}
+      <span *ngIf="backendInfo" class="backend-version">
+        | Backend: v{{ backendInfo.version }}
+      </span>
+      <span *ngIf="backendError" class="backend-error">
+        | Backend: niedostępny
+      </span>
+    </div>
+  </footer>
+</div>
+

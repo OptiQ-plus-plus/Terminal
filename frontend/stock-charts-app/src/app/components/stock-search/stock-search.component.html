@@ -1,0 +1,40 @@
+<div class="search-container">
+  <div class="search-form">
+    <h2>Wyszukaj akcje</h2>
+    <div class="search-input-container">
+      <input
+        type="text"
+        class="search-input"
+        [formControl]="searchControl"
+        (input)="onSearchInput()"
+        placeholder="Wpisz symbol lub nazwę spółki (np. AAPL, Microsoft)"
+      />
+      <div class="search-icon">
+        <i class="fa fa-search"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="search-results" *ngIf="(searchResults$ | async)?.length || isLoading">
+    <div class="loading-spinner" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <span>Wyszukiwanie...</span>
+    </div>
+    
+    <div class="results-list" *ngIf="!isLoading">
+      <div 
+        class="result-item" 
+        *ngFor="let stock of searchResults$ | async" 
+        (click)="viewStock(stock.symbol)"
+      >
+        <div class="stock-symbol">{{ stock.symbol }}</div>
+        <div class="stock-name">{{ stock.name }}</div>
+        <div class="stock-meta">
+          <span class="stock-type">{{ stock.type }}</span>
+          <span class="stock-region">{{ stock.region }}</span>
+          <span class="stock-currency">{{ stock.currency }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

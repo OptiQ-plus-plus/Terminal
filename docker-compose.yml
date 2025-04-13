@@ -1,0 +1,47 @@
+services:
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stockcharts-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=presentation/app.py
+      - FLASK_ENV=development
+      - ALPHA_VANTAGE_API_KEY=I9THSIF9RMRF5AZJ
+      - FLASK_DEBUG=1
+      - PYTHONPATH=/app
+      - FLASK_RUN_EXTRA_FILES=*.py
+    volumes:
+      - ./backend:/app
+    networks:
+      - stockcharts-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend/stock-charts-app
+      dockerfile: Dockerfile
+    container_name: stockcharts-frontend
+    restart: always
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend/stock-charts-app:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - stockcharts-network
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - FAST_REFRESH=true
+      - BROWSER=none
+
+networks:
+  stockcharts-network:
+    driver: bridge 

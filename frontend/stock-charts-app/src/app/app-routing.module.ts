@@ -1,0 +1,1 @@
+// Ten plik został usunięty, ponieważ aplikacja korzysta z podejścia standalone w Angular 17

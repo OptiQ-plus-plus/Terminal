@@ -1,0 +1,66 @@
+<div class="popular-stocks-container">
+  <div class="popular-stocks-header">
+    <h1>Wykresy Giełdowe</h1>
+    <p>Wybierz akcję z listy lub <a routerLink="/search">wyszukaj</a> dowolną spółkę.</p>
+  </div>
+
+  <div class="stock-selection">
+    <div class="stock-tabs">
+      <button 
+        *ngFor="let stock of popularStocks" 
+        [class.active]="selectedStock?.symbol === stock.symbol"
+        (click)="selectStock(stock)"
+      >
+        {{ stock.symbol }}
+      </button>
+    </div>
+  </div>
+
+  <div class="stock-content" *ngIf="selectedStock">
+    <div class="stock-header">
+      <div class="stock-info">
+        <h2>{{ selectedStock.name }} ({{ selectedStock.symbol }})</h2>
+        <div class="stock-meta">
+          <span class="stock-type">{{ selectedStock.type }}</span>
+          <span class="stock-region">{{ selectedStock.region }}</span>
+          <span class="stock-currency">{{ selectedStock.currency }}</span>
+        </div>
+      </div>
+      
+      <div class="indicators-toggle">
+        <button class="indicators-button" (click)="indicatorsPanel.classList.toggle('open')">
+          Wskaźniki techniczne
+        </button>
+      </div>
+    </div>
+    
+    <div class="indicators-panel" #indicatorsPanel>
+      <h3>Wskaźniki techniczne</h3>
+      <div class="indicators-list">
+        <div class="indicator-item" *ngFor="let indicator of technicalIndicators">
+          <label class="toggle">
+            <input type="checkbox" [checked]="indicator.enabled" (change)="toggleIndicator(indicator)">
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="indicator-info">
+            <div class="indicator-name">{{ indicator.name }}</div>
+            <div class="indicator-description">{{ indicator.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Ładowanie danych...</span>
+    </div>
+    
+    <div class="error-message" *ngIf="error">
+      <div class="error-icon">⚠️</div>
+      <span>{{ error }}</span>
+      <button (click)="loadStockData()">Spróbuj ponownie</button>
+    </div>
+    
+    <app-stock-chart [stockData]="stockData" *ngIf="!loading && !error && stockData"></app-stock-chart>
+  </div>
+</div> 

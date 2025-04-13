@@ -1,0 +1,156 @@
+<div class="stock-details-container">
+  <div class="back-button">
+    <a routerLink="/">
+      <i class="fa fa-arrow-left"></i> Powrót do wyszukiwania
+    </a>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Ładowanie danych...</p>
+  </div>
+  
+  <div class="error-container" *ngIf="error">
+    <div class="error-message">
+      <i class="fa fa-exclamation-circle"></i>
+      <p>{{ error }}</p>
+    </div>
+    <button (click)="loadStockData()" class="retry-button">
+      Spróbuj ponownie
+    </button>
+  </div>
+
+  <div class="stock-content" *ngIf="!loading && !error">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Interwał:</label>
+        <div class="button-group">
+          <button 
+            [class.active]="selectedInterval === 'daily'" 
+            (click)="changeInterval('daily')"
+          >
+            Dziennie
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'weekly'" 
+            (click)="changeInterval('weekly')"
+          >
+            Tygodniowo
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'monthly'" 
+            (click)="changeInterval('monthly')"
+          >
+            Miesięcznie
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'intraday_5min'" 
+            (click)="changeInterval('intraday_5min')"
+          >
+            5 min
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'intraday_15min'" 
+            (click)="changeInterval('intraday_15min')"
+          >
+            15 min
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'intraday_30min'" 
+            (click)="changeInterval('intraday_30min')"
+          >
+            30 min
+          </button>
+          <button 
+            [class.active]="selectedInterval === 'intraday_60min'" 
+            (click)="changeInterval('intraday_60min')"
+          >
+            60 min
+          </button>
+        </div>
+      </div>
+      
+      <div class="filter-group" *ngIf="selectedInterval === 'daily'">
+        <label>Okres:</label>
+        <div class="button-group">
+          <button 
+            [class.active]="selectedPeriod === '5d'" 
+            (click)="changePeriod('5d')"
+          >
+            5 dni
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '1m'" 
+            (click)="changePeriod('1m')"
+          >
+            1 miesiąc
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '3m'" 
+            (click)="changePeriod('3m')"
+          >
+            3 miesiące
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '6m'" 
+            (click)="changePeriod('6m')"
+          >
+            6 miesięcy
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '1y'" 
+            (click)="changePeriod('1y')"
+          >
+            1 rok
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '2y'" 
+            (click)="changePeriod('2y')"
+          >
+            2 lata
+          </button>
+          <button 
+            [class.active]="selectedPeriod === '5y'" 
+            (click)="changePeriod('5y')"
+          >
+            5 lat
+          </button>
+          <button 
+            [class.active]="selectedPeriod === 'max'" 
+            (click)="changePeriod('max')"
+          >
+            Max
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <app-stock-chart [stockData]="stockData"></app-stock-chart>
+    
+    <div class="stock-data-table" *ngIf="stockData && stockData.prices && stockData.prices.length > 0">
+      <h3>Ostatnie dane</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Otwarcie</th>
+            <th>Najwyższy</th>
+            <th>Najniższy</th>
+            <th>Zamknięcie</th>
+            <th>Wolumen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let price of stockData.prices.slice(0, 10)">
+            <td>{{ price.timestamp | date:'medium' }}</td>
+            <td>{{ price.open | number:'1.2-2' }}</td>
+            <td>{{ price.high | number:'1.2-2' }}</td>
+            <td>{{ price.low | number:'1.2-2' }}</td>
+            <td>{{ price.close | number:'1.2-2' }}</td>
+            <td>{{ price.volume | number }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div> 
