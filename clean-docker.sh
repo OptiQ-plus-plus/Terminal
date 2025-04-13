@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "==============================================="
-echo "Całkowite usuwanie zasobów Docker dla StockCharts"
+echo "Całkowite usuwanie zasobów Docker dla OptiQ Terminal"
 echo "==============================================="
 
 # Sprawdź, czy Docker jest zainstalowany
@@ -15,37 +15,37 @@ echo "Zatrzymywanie i usuwanie kontenerów..."
 echo "------------------------------------"
 
 # Zatrzymaj i usuń kontenery, sieci i woluminy związane z aplikacją
-docker compose down
+sudo docker compose down
 
 echo ""
 echo "Usuwanie obrazów Docker związanych z aplikacją..."
 echo "-----------------------------------------------"
 
 # Usuń obrazy związane z aplikacją
+echo "Próba usunięcia obrazu terminal-frontend..."
+sudo docker image rm terminal-frontend 2>/dev/null && echo "✓ Usunięto obraz terminal-frontend" || echo "✕ Nie znaleziono obrazu terminal-frontend"
+
+echo "Próba usunięcia obrazu terminal-backend..."
+sudo docker image rm terminal-backend 2>/dev/null && echo "✓ Usunięto obraz terminal-backend" || echo "✕ Nie znaleziono obrazu terminal-backend"
+
 echo "Próba usunięcia obrazu stockcharts-frontend..."
-docker image rm stockcharts-frontend 2>/dev/null && echo "✓ Usunięto obraz stockcharts-frontend" || echo "✕ Nie znaleziono obrazu stockcharts-frontend"
+sudo docker image rm stockcharts-frontend 2>/dev/null && echo "✓ Usunięto obraz stockcharts-frontend" || echo "✕ Nie znaleziono obrazu stockcharts-frontend"
 
 echo "Próba usunięcia obrazu stockcharts-backend..."
-docker image rm stockcharts-backend 2>/dev/null && echo "✓ Usunięto obraz stockcharts-backend" || echo "✕ Nie znaleziono obrazu stockcharts-backend"
-
-echo "Próba usunięcia obrazu qchackhaton-frontend..."
-docker image rm qchackhaton-frontend 2>/dev/null && echo "✓ Usunięto obraz qchackhaton-frontend" || echo "✕ Nie znaleziono obrazu qchackhaton-frontend"
-
-echo "Próba usunięcia obrazu qchackhaton-backend..."
-docker image rm qchackhaton-backend 2>/dev/null && echo "✓ Usunięto obraz qchackhaton-backend" || echo "✕ Nie znaleziono obrazu qchackhaton-backend"
+sudo docker image rm stockcharts-backend 2>/dev/null && echo "✓ Usunięto obraz stockcharts-backend" || echo "✕ Nie znaleziono obrazu stockcharts-backend"
 
 echo ""
 echo "Usuwanie nieużywanych obrazów, kontenerów i woluminów..."
 echo "-----------------------------------------------------"
 
 # Usuń nieużywane obrazy, kontenery i woluminy
-docker system prune -f
+sudo docker system prune -f
 
 echo ""
 echo "Sprawdzanie aktualnego stanu Docker..."
 echo "-------------------------------------"
 echo "Działające kontenery:"
-docker ps
+sudo docker ps
 
 echo ""
 echo "==============================================="

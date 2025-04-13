@@ -1,0 +1,199 @@
+<div class="options-analyzer-container">
+  <h1 class="component-title">Analizator Opcji</h1>
+  
+  <div class="search-panel card">
+    <h2>Wybierz opcje do analizy</h2>
+    
+    <form [formGroup]="searchForm" (ngSubmit)="searchOptions()" class="options-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="symbol">Instrument bazowy</label>
+          <select id="symbol" formControlName="symbol" (change)="onSymbolChange()" class="form-control">
+            <option *ngFor="let symbol of stockSymbols" [value]="symbol">{{ symbol }}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="expirationDate">Data wygaśnięcia</label>
+          <select id="expirationDate" formControlName="expirationDate" class="form-control" [disabled]="!expirationDates.length">
+            <option *ngFor="let date of expirationDates" [value]="date">{{ date }}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="optionType">Typ opcji</label>
+          <select id="optionType" formControlName="optionType" class="form-control">
+            <option value="call">Call</option>
+            <option value="put">Put</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="minStrike">Min. cena wykonania</label>
+          <input type="number" id="minStrike" formControlName="minStrike" class="form-control" placeholder="Min. cena">
+        </div>
+        
+        <div class="form-group">
+          <label for="maxStrike">Max. cena wykonania</label>
+          <input type="number" id="maxStrike" formControlName="maxStrike" class="form-control" placeholder="Max. cena">
+        </div>
+        
+        <div class="form-group button-group">
+          <button type="submit" class="btn primary" [disabled]="searchForm.invalid || loading">
+            <span *ngIf="!loading">Wyszukaj opcje</span>
+            <span *ngIf="loading">Ładowanie...</span>
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <div *ngIf="error" class="alert error">
+      {{ error }}
+    </div>
+  </div>
+  
+  <div *ngIf="options.length" class="results-panel">
+    <div class="options-list card">
+      <h2>Dostępne opcje ({{ options.length }})</h2>
+      
+      <div class="table-container">
+        <table class="options-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Cena wyk.</th>
+              <th>Ostatnia cena</th>
+              <th>Zmiana %</th>
+              <th>Wolumen</th>
+              <th>IV</th>
+              <th>Delta</th>
+              <th>Gamma</th>
+              <th>Theta</th>
+              <th>Vega</th>
+              <th>Rho</th>
+              <th>Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let option of options" 
+                [class.selected]="selectedOption?.symbol === option.symbol"
+                (click)="selectOption(option)">
+              <td>{{ option.symbol }}</td>
+              <td>{{ option.strikePrice | number:'1.2-2' }}</td>
+              <td>{{ option.lastPrice | number:'1.2-2' }}</td>
+              <td [class.positive]="option.percentChange > 0" [class.negative]="option.percentChange < 0">
+                {{ option.percentChange | number:'1.2-2' }}%
+              </td>
+              <td>{{ option.volume | number }}</td>
+              <td>{{ option.impliedVolatility | number:'1.2-2' }}%</td>
+              <td>{{ option.greeks.delta | number:'1.4-4' }}</td>
+              <td>{{ option.greeks.gamma | number:'1.4-4' }}</td>
+              <td>{{ option.greeks.theta | number:'1.4-4' }}</td>
+              <td>{{ option.greeks.vega | number:'1.4-4' }}</td>
+              <td>{{ option.greeks.rho | number:'1.4-4' }}</td>
+              <td>
+                <button class="btn small" (click)="generatePrediction(); $event.stopPropagation()">
+                  Analizuj
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div *ngIf="selectedOption" class="option-details card">
+      <h2>Szczegóły opcji: {{ selectedOption.symbol }}</h2>
+      
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">Instrument bazowy:</span>
+          <span class="value">{{ selectedOption.underlyingSymbol }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Typ opcji:</span>
+          <span class="value">{{ selectedOption.optionType === 'call' ? 'CALL' : 'PUT' }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Data wygaśnięcia:</span>
+          <span class="value">{{ selectedOption.expirationDate }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Cena wykonania:</span>
+          <span class="value">{{ selectedOption.strikePrice | number:'1.2-2' }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Ostatnia cena:</span>
+          <span class="value">{{ selectedOption.lastPrice | number:'1.2-2' }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Bid/Ask:</span>
+          <span class="value">{{ selectedOption.bid | number:'1.2-2' }} / {{ selectedOption.ask | number:'1.2-2' }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Zmiana:</span>
+          <span class="value" [class.positive]="selectedOption.change > 0" [class.negative]="selectedOption.change < 0">
+            {{ selectedOption.change | number:'1.2-2' }} ({{ selectedOption.percentChange | number:'1.2-2' }}%)
+          </span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Wolumen:</span>
+          <span class="value">{{ selectedOption.volume | number }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Open Interest:</span>
+          <span class="value">{{ selectedOption.openInterest | number }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="label">Zmienność implikowana:</span>
+          <span class="value">{{ selectedOption.impliedVolatility | number:'1.2-2' }}%</span>
+        </div>
+      </div>
+      
+      <div class="greeks-container">
+        <h3>Grecy</h3>
+        <div class="greeks-grid">
+          <div class="greek-item">
+            <span class="label">Delta:</span>
+            <span class="value">{{ selectedOption.greeks.delta | number:'1.4-4' }}</span>
+          </div>
+          
+          <div class="greek-item">
+            <span class="label">Gamma:</span>
+            <span class="value">{{ selectedOption.greeks.gamma | number:'1.4-4' }}</span>
+          </div>
+          
+          <div class="greek-item">
+            <span class="label">Theta:</span>
+            <span class="value">{{ selectedOption.greeks.theta | number:'1.4-4' }}</span>
+          </div>
+          
+          <div class="greek-item">
+            <span class="label">Vega:</span>
+            <span class="value">{{ selectedOption.greeks.vega | number:'1.4-4' }}</span>
+          </div>
+          
+          <div class="greek-item">
+            <span class="label">Rho:</span>
+            <span class="value">{{ selectedOption.greeks.rho | number:'1.4-4' }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button class="btn primary" (click)="generatePrediction()">Generuj predykcję</button>
+      </div>
+    </div>
+  </div>
+</div> 

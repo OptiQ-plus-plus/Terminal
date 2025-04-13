@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "==============================================="
-echo "Zatrzymywanie aplikacji StockCharts w Dockerze"
+echo "Zatrzymywanie aplikacji OptiQ Terminal w Dockerze"
 echo "==============================================="
 
 # Sprawdź, czy Docker jest zainstalowany
@@ -15,16 +15,18 @@ echo "Zatrzymywanie i usuwanie kontenerów..."
 echo "------------------------------------"
 
 # Zatrzymaj i usuń kontenery, sieci, woluminy i obrazy związane z aplikacją
-docker compose down
+sudo docker compose down
 
 echo ""
 echo "Sprawdzanie statusu zatrzymania..."
 echo "--------------------------------"
-if [ "$(docker ps -q -f name=stockcharts)" ]; then
+if [ "$(sudo docker ps -q -f name=terminal)" ] || [ "$(sudo docker ps -q -f name=stockcharts)" ]; then
     echo "⚠️ Uwaga: Nadal istnieją uruchomione kontenery:"
-    docker ps -f name=stockcharts
+    sudo docker ps -f name=terminal
+    sudo docker ps -f name=stockcharts
     echo "Próba zatrzymania wszystkich kontenerów związanych z aplikacją..."
-    docker stop $(docker ps -q -f name=stockcharts) 2>/dev/null || true
+    sudo docker stop $(sudo docker ps -q -f name=terminal) 2>/dev/null || true
+    sudo docker stop $(sudo docker ps -q -f name=stockcharts) 2>/dev/null || true
 else
     echo "✅ Wszystkie kontenery zostały zatrzymane pomyślnie."
 fi

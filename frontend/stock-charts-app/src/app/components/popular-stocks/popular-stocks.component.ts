@@ -129,7 +129,44 @@ export class PopularStocksComponent implements OnInit {
 
   toggleIndicator(indicator: TechnicalIndicator): void {
     indicator.enabled = !indicator.enabled;
-    // Tutaj można dodać logikę do zastosowania wskaźnika na wykresie
     console.log(`Wskaźnik ${indicator.name} jest teraz ${indicator.enabled ? 'włączony' : 'wyłączony'}`);
+    console.log('Aktualna lista wskaźników:', JSON.stringify(this.technicalIndicators));
+    
+    // Aby wymusić odświeżenie widoku, możemy utworzyć nową referencję dla tablicy
+    this.technicalIndicators = [...this.technicalIndicators];
+  }
+  
+  // Metoda do ręcznego odświeżania danych (do celów testowych)
+  testLoadData(): void {
+    if (!this.selectedStock) {
+      console.warn('Nie wybrano akcji do odświeżenia');
+      return;
+    }
+    
+    console.log('Ręczne pobieranie danych dla:', this.selectedStock.symbol);
+    
+    // Dodajemy timestamp do zapytania, aby uniknąć cachowania po stronie serwera
+    const now = new Date().toISOString();
+    
+    this.stockService.getStockData(this.selectedStock.symbol, 'daily', '1m', now)
+      .subscribe({
+        next: response => {
+          console.log('Otrzymane dane:', response);
+          if (response && response.data) {
+            this.stockData = response.data;
+            console.log('Liczba punktów danych:', this.stockData.prices.length);
+            
+            // Sprawdźmy kilka pierwszych punktów danych
+            if (this.stockData.prices.length > 0) {
+              console.log('Przykładowe punkty danych:', this.stockData.prices.slice(0, 5));
+            }
+          } else {
+            console.error('Brak danych w odpowiedzi:', response);
+          }
+        },
+        error: err => {
+          console.error('Błąd podczas pobierania danych:', err);
+        }
+      });
   }
 } 

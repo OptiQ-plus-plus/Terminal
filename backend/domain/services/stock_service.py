@@ -30,15 +30,36 @@ class StockService:
         Returns:
             Dane giełdowe
         """
-        if interval == "daily":
-            return self.repository.get_daily_data(symbol, start_date, end_date)
-        elif interval == "weekly":
-            return self.repository.get_weekly_data(symbol)
-        elif interval == "monthly":
-            return self.repository.get_monthly_data(symbol)
-        elif interval.startswith("intraday"):
-            # format: intraday_1min, intraday_5min, intraday_15min, intraday_30min, intraday_60min
-            intraday_interval = interval.split("_")[1] if "_" in interval else "5min"
-            return self.repository.get_intraday_data(symbol, intraday_interval)
-        else:
-            raise ValueError(f"Nieobsługiwany interwał: {interval}") 
+        print(f"[DEBUG][DomainService] get_stock_data - symbol: {symbol}, interval: {interval}, start_date: {start_date}, end_date: {end_date}")
+        
+        try:
+            if interval == "daily":
+                print(f"[DEBUG][DomainService] Pobieranie danych dziennych dla {symbol}")
+                data = self.repository.get_daily_data(symbol, start_date, end_date)
+            elif interval == "weekly":
+                print(f"[DEBUG][DomainService] Pobieranie danych tygodniowych dla {symbol}")
+                data = self.repository.get_weekly_data(symbol)
+            elif interval == "monthly":
+                print(f"[DEBUG][DomainService] Pobieranie danych miesięcznych dla {symbol}")
+                data = self.repository.get_monthly_data(symbol)
+            elif interval.startswith("intraday"):
+                # format: intraday_1min, intraday_5min, intraday_15min, intraday_30min, intraday_60min
+                intraday_interval = interval.split("_")[1] if "_" in interval else "5min"
+                print(f"[DEBUG][DomainService] Pobieranie danych intraday ({intraday_interval}) dla {symbol}")
+                data = self.repository.get_intraday_data(symbol, intraday_interval)
+            else:
+                error_msg = f"Nieobsługiwany interwał: {interval}"
+                print(f"[ERROR][DomainService] {error_msg}")
+                raise ValueError(error_msg)
+            
+            if data:
+                print(f"[DEBUG][DomainService] Pobrano dane dla {symbol} - punktów: {len(data.prices)}, ostatnie odświeżenie: {data.last_refreshed}")
+            else:
+                print(f"[WARNING][DomainService] Nie pobrano danych dla {symbol} - null response")
+            
+            return data
+        except Exception as e:
+            import traceback
+            print(f"[ERROR][DomainService] Błąd podczas pobierania danych dla {symbol}: {str(e)}")
+            print(f"[ERROR][DomainService] Szczegóły: {traceback.format_exc()}")
+            raise 

@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 4200
 
 # Uruchomienie serwera developerskiego w trybie watch (z ulepszonymi opcjami dla hot reload)
-CMD ["npm", "start", "--", "--host", "0.0.0.0", "--disable-host-check", "--poll=2000", "--watch", "--live-reload", "--hmr"] 
+CMD ["npm", "run", "start:watch", "--", "--host", "0.0.0.0", "--disable-host-check"] 

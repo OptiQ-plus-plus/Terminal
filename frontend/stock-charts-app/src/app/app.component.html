@@ -1,21 +1,62 @@
 <div class="app-container">
   <header class="app-header">
     <div class="logo">
-      <h1>StockCharts</h1>
-      <p>Wykresy giełdowe z API Alpha Vantage</p>
+      <h1>OptiQ Terminal</h1>
+      <p>Zaawansowana analiza opcji i instrumentów finansowych</p>
     </div>
-    <nav class="main-nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Popularne akcje</a>
-      <a routerLink="/search" routerLinkActive="active">Wyszukiwarka</a>
-    </nav>
+    <div class="theme-toggle">
+      <button (click)="toggleTheme()" class="theme-button">
+        <span *ngIf="currentTheme === 'light'">Tryb ciemny</span>
+        <span *ngIf="currentTheme === 'dark'">Tryb jasny</span>
+      </button>
+    </div>
   </header>
   
   <main class="app-content">
-    <router-outlet></router-outlet>
+    <div class="sidebar">
+      <h2>Narzędzia</h2>
+      <nav class="tools-nav">
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Pulpit</a>
+        <a routerLink="/options-analyzer" routerLinkActive="active">Analizator opcji</a>
+        <a routerLink="/prediction-models" routerLinkActive="active">Modele predykcji</a>
+        <a routerLink="/optimization" routerLinkActive="active">Optymalizacja</a>
+        <a routerLink="/api-settings" routerLinkActive="active">Ustawienia API</a>
+      </nav>
+      
+      <h2>Indeksy giełdowe</h2>
+      <div class="market-indices">
+        <div class="index-item">
+          <span class="index-name">S&P 500</span>
+          <span class="index-value">5,124.34</span>
+          <span class="index-change positive">+0.82%</span>
+        </div>
+        <div class="index-item">
+          <span class="index-name">NASDAQ</span>
+          <span class="index-value">16,789.45</span>
+          <span class="index-change positive">+1.14%</span>
+        </div>
+        <div class="index-item">
+          <span class="index-name">DOW JONES</span>
+          <span class="index-value">39,543.67</span>
+          <span class="index-change negative">-0.32%</span>
+        </div>
+      </div>
+      
+      <h2>Obserwowane opcje</h2>
+      <div class="watched-options">
+        <div class="option-item">IBM</div>
+        <div class="option-item">INTC</div>
+        <div class="option-item">TSLA</div>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </main>
   
   <footer class="app-footer">
-    <p>&copy; 2023 StockCharts - Aplikacja DDD w technologiach Flask i Angular</p>
+    <p>&copy; 2025 OptiQ Terminal - Zaawansowana platforma analizy opcji z integracją obliczeń kwantowych</p>
     <div class="version-info">
       Frontend: v{{ appVersion }}
       <span *ngIf="backendInfo" class="backend-version">

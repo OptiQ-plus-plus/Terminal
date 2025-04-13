@@ -123,9 +123,54 @@
           </button>
         </div>
       </div>
+      
+      <div class="filter-group">
+        <label>Typ wykresu:</label>
+        <div class="button-group">
+          <button 
+            [class.active]="selectedChartType === 'candlestick'" 
+            (click)="changeChartType('candlestick')"
+          >
+            Świece
+          </button>
+          <button 
+            [class.active]="selectedChartType === 'line'" 
+            (click)="changeChartType('line')"
+          >
+            Linia
+          </button>
+          <button 
+            [class.active]="selectedChartType === 'ohlc'" 
+            (click)="changeChartType('ohlc')"
+          >
+            OHLC
+          </button>
+        </div>
+      </div>
     </div>
     
-    <app-stock-chart [stockData]="stockData"></app-stock-chart>
+    <div class="technical-indicators">
+      <h3>Wskaźniki techniczne</h3>
+      <div class="indicators-grid">
+        <div class="indicator-item" *ngFor="let indicator of technicalIndicators">
+          <div class="indicator-header">
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="indicator.enabled" (change)="toggleIndicator(indicator.id)">
+              <span class="slider"></span>
+            </label>
+            <span class="indicator-name">{{ indicator.name }}</span>
+          </div>
+          <div class="indicator-description">{{ indicator.description }}</div>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshData()">Odśwież dane</button>
+    </div>
+    
+    <app-stock-chart 
+      [stockData]="stockData" 
+      [chartType]="selectedChartType"
+      [technicalIndicators]="technicalIndicators"
+    ></app-stock-chart>
     
     <div class="stock-data-table" *ngIf="stockData && stockData.prices && stockData.prices.length > 0">
       <h3>Ostatnie dane</h3>

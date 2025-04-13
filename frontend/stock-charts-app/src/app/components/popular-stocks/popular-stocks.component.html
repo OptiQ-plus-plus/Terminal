@@ -48,6 +48,11 @@
           </div>
         </div>
       </div>
+      <div class="debug-controls" style="margin-top: 15px; text-align: right;">
+        <button (click)="testLoadData()" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+          Odśwież dane
+        </button>
+      </div>
     </div>
 
     <div class="loading-spinner" *ngIf="loading">
@@ -61,6 +66,9 @@
       <button (click)="loadStockData()">Spróbuj ponownie</button>
     </div>
     
-    <app-stock-chart [stockData]="stockData" *ngIf="!loading && !error && stockData"></app-stock-chart>
+    <app-stock-chart 
+      [stockData]="stockData" 
+      [technicalIndicators]="technicalIndicators"
+      *ngIf="!loading && !error && stockData"></app-stock-chart>
   </div>
 </div> 

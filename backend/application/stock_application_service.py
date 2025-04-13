@@ -43,6 +43,8 @@ class StockApplicationService:
         Returns:
             Dane giełdowe w formacie JSON
         """
+        print(f"[DEBUG][ApplicationService] get_stock_data - symbol: {symbol}, interval: {interval}, period: {period}, start_date: {start_date}, end_date: {end_date}")
+        
         # Mapowanie okresu na daty
         start_datetime = None
         end_datetime = None
@@ -67,23 +69,41 @@ class StockApplicationService:
             elif period == "5y":
                 start_datetime = end_datetime - timedelta(days=5*365)
             # Dla "max" nie ustawiamy daty początkowej
+            
+            print(f"[DEBUG][ApplicationService] Okres {period} przekształcony na daty: {start_datetime} - {end_datetime}")
         
         # Przekształcenie dat z stringów
-        if start_date and not start_datetime:
-            start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+        try:
+            if start_date and not start_datetime:
+                start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+                print(f"[DEBUG][ApplicationService] Przekształcono start_date '{start_date}' na {start_datetime}")
+            
+            if end_date:
+                end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+                print(f"[DEBUG][ApplicationService] Przekształcono end_date '{end_date}' na {end_datetime}")
+        except ValueError as e:
+            print(f"[ERROR][ApplicationService] Błąd podczas parsowania dat: {str(e)}")
+            raise ValueError(f"Nieprawidłowy format daty: {str(e)}")
         
-        if end_date:
-            end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+        print(f"[DEBUG][ApplicationService] Pobieranie danych z serwisu domenowego - symbol: {symbol}, interval: {interval}, start_date: {start_datetime}, end_date: {end_datetime}")
         
-        # Pobieranie danych
-        stock_data = self.stock_service.get_stock_data(
-            symbol, 
-            interval=interval, 
-            start_date=start_datetime, 
-            end_date=end_datetime
-        )
-        
-        return self._stock_data_to_dict(stock_data)
+        try:
+            # Pobieranie danych
+            stock_data = self.stock_service.get_stock_data(
+                symbol, 
+                interval=interval, 
+                start_date=start_datetime, 
+                end_date=end_datetime
+            )
+            
+            result = self._stock_data_to_dict(stock_data)
+            print(f"[DEBUG][ApplicationService] Pobrano dane dla {symbol} - liczba punktów: {len(result.get('prices', []))}")
+            return result
+        except Exception as e:
+            import traceback
+            print(f"[ERROR][ApplicationService] Błąd podczas pobierania danych dla {symbol}: {str(e)}")
+            print(f"[ERROR][ApplicationService] Szczegóły: {traceback.format_exc()}")
+            raise
     
     def _stock_metadata_to_dict(self, metadata: StockMetadata) -> Dict[str, Any]:
         """Konwertuje obiekt StockMetadata na słownik."""

@@ -1,0 +1,119 @@
+<div class="prediction-models-container">
+  <h1 class="component-title">Modele Predykcji</h1>
+  
+  <div class="card">
+    <h2>Generator rozkładu prawdopodobieństwa</h2>
+    <p class="description">Generuj przewidywania dla przyszłych cen opcji na podstawie modeli statystycznych.</p>
+    
+    <form [formGroup]="predictionForm" (ngSubmit)="onSubmit()" class="prediction-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="symbol">Instrument bazowy</label>
+          <select id="symbol" formControlName="symbol" class="form-control">
+            <option *ngFor="let symbol of symbols" [value]="symbol">{{ symbol }}</option>
+          </select>
+          <div class="form-error" *ngIf="predictionForm.get('symbol')?.invalid && predictionForm.get('symbol')?.touched">
+            Wybierz instrument bazowy
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="strikePrice">Cena wykonania</label>
+          <input type="number" id="strikePrice" formControlName="strikePrice" class="form-control">
+          <div class="form-error" *ngIf="predictionForm.get('strikePrice')?.invalid && predictionForm.get('strikePrice')?.touched">
+            Podaj poprawną cenę wykonania (min. 1)
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="timeHorizon">Horyzont czasowy (dni)</label>
+          <input type="number" id="timeHorizon" formControlName="timeHorizon" class="form-control">
+          <div class="form-error" *ngIf="predictionForm.get('timeHorizon')?.invalid && predictionForm.get('timeHorizon')?.touched">
+            Podaj poprawny horyzont (1-365 dni)
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="volatilityMultiplier">Mnożnik zmienności</label>
+          <input type="number" id="volatilityMultiplier" formControlName="volatilityMultiplier" class="form-control" step="0.1">
+          <div class="form-error" *ngIf="predictionForm.get('volatilityMultiplier')?.invalid && predictionForm.get('volatilityMultiplier')?.touched">
+            Podaj poprawny mnożnik (0.1-5)
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="confidenceLevel">Poziom ufności</label>
+          <input type="number" id="confidenceLevel" formControlName="confidenceLevel" class="form-control" step="0.01">
+          <div class="form-error" *ngIf="predictionForm.get('confidenceLevel')?.invalid && predictionForm.get('confidenceLevel')?.touched">
+            Podaj poprawny poziom ufności (0.5-0.99)
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn primary" [disabled]="predictionForm.invalid || loading">
+          <span *ngIf="!loading">Generuj predykcję</span>
+          <span *ngIf="loading">Obliczanie...</span>
+        </button>
+      </div>
+    </form>
+    
+    <div *ngIf="error" class="alert error">
+      {{ error }}
+    </div>
+  </div>
+  
+  <div *ngIf="predictionResult" class="card result-card">
+    <h2>Wyniki predykcji</h2>
+    
+    <div class="result-summary">
+      <div class="summary-item">
+        <span class="label">Wartość oczekiwana:</span>
+        <span class="value">{{ predictionResult.expectedValue | number:'1.2-2' }}</span>
+      </div>
+      
+      <div class="summary-item">
+        <span class="label">Wariancja:</span>
+        <span class="value">{{ predictionResult.variance | number:'1.2-2' }}</span>
+      </div>
+      
+      <div class="summary-item">
+        <span class="label">Skośność:</span>
+        <span class="value">{{ predictionResult.skewness | number:'1.2-2' }}</span>
+      </div>
+      
+      <div class="summary-item">
+        <span class="label">Kurtoza:</span>
+        <span class="value">{{ predictionResult.kurtosis | number:'1.2-2' }}</span>
+      </div>
+    </div>
+    
+    <h3>Przedziały ufności</h3>
+    <div class="confidence-intervals">
+      <div class="interval-item" *ngFor="let interval of predictionResult.confidenceIntervals">
+        <div class="interval-level">{{ interval.confidence * 100 }}%</div>
+        <div class="interval-range">{{ interval.lowerBound | number:'1.2-2' }} - {{ interval.upperBound | number:'1.2-2' }}</div>
+      </div>
+    </div>
+    
+    <h3>Rozkład dyskretny</h3>
+    <div class="distribution-chart">
+      <div class="chart-bar" *ngFor="let point of predictionResult.discretePoints" 
+           [style.height]="(point.probability * 150) + 'px'"
+           [style.left]="((point.value - predictionResult.expectedValue) * 5 + 50) + '%'">
+        <div class="bar-tooltip">
+          <div>Wartość: {{ point.value | number:'1.2-2' }}</div>
+          <div>Prawdopodobieństwo: {{ point.probability | percent:'1.1-2' }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chart-axis">
+      <div class="axis-label" *ngFor="let point of predictionResult.discretePoints">
+        {{ point.value | number:'1.0-0' }}
+      </div>
+    </div>
+  </div>
+</div> 
